@@ -1,0 +1,57 @@
+import type { agents as en } from "../en/agents.ts";
+
+export const agents: typeof en = {
+  title: "Agenti",
+  subtitle: "Assistenti AI che chiedono alle camere cosa succede in casa.",
+  help: [
+    "Qui si collegano assistenti come Arkimede, Claude, OpenClaw o Hermes.",
+    "Sono in sola lettura: possono chiedere, ma non cambiano nulla.",
+  ],
+  never: "mai",
+  copy: "Copia",
+  copied: "Copiato",
+  copyAddress: "Copia l'indirizzo",
+  server: {
+    title: "Server MCP",
+    intro: "L'indirizzo a cui si collegano gli agenti, ognuno con il suo token.",
+    stream: "Eventi in diretta per i programmi, con lo stesso token.",
+    help: [
+      "MCP è il modo standard con cui gli assistenti AI usano strumenti esterni. Gli agenti si collegano al primo indirizzo via HTTP.",
+      "Possono chiedere chi c'è e dove, gli eventi passati, le camere e cosa osserva ciascuna; le immagini solo delle camere abilitate più sotto.",
+      "Con lo stesso token un programma segue gli eventi in diretta al secondo indirizzo (Server-Sent Events) e recupera quelli persi mentre era fermo. Lo usa il plugin di Arkimede.",
+    ],
+  },
+  clients: {
+    title: "Client",
+    help: [
+      "Crea un token per ogni client, così puoi revocarli uno per uno.",
+      "Un agente (un assistente AI) usa l'MCP e gli eventi in diretta, e vede le immagini solo delle camere permesse qui sotto. Un dispositivo (un pannello, un campanello, un archivio di foto) segnala eventi esterni, aggiunge volti e riceve le foto degli eventi esterni, ma non ha l'MCP.",
+      "Il token si vede una volta sola, quando lo crei: copialo subito.",
+      "In Claude Code: `claude mcp add --transport http percezione <indirizzo> --header \"Authorization: Bearer <token>\"`.",
+      "Altri agenti: server MCP HTTP («streamable HTTP») all'indirizzo qui sopra, con l'intestazione `Authorization: Bearer <token>`.",
+    ],
+    emptyTitle: "Ancora nessun agente collegato",
+    emptyText: "Dai un nome al primo agente qui sotto e crea il suo token.",
+    usage: (created: string, lastUsed: string) => `creato ${created} · ultimo uso ${lastUsed}`,
+    revoke: "Revoca",
+    confirmRevoke: "Conferma: revoca",
+    tokenOnce: (name: string) => `Token di «${name}»: copialo adesso, non lo vedrai più.`,
+    copyToken: "Copia il token",
+    claudeCode: "Per esempio, in Claude Code:",
+    otherClients: "Altri agenti: server MCP HTTP a questo indirizzo, intestazione Authorization: Bearer e il token.",
+    done: "Fatto",
+    newAgent: "Nuovo client",
+    newAgentHint: "Un nome per riconoscerlo, es. Claude Code o Pannello",
+    role: "Tipo",
+    roles: { agent: "Agente", device: "Dispositivo" },
+    roleHint: { agent: "MCP ed eventi in diretta; immagini solo delle camere permesse.", device: "Eventi esterni con le loro foto, import dei volti; niente MCP." },
+    deviceUse: "Usalo nell'intestazione Authorization: Bearer delle richieste del dispositivo (/external, /people, /events).",
+    create: "Crea il token",
+  },
+  images: {
+    title: "Immagini delle camere",
+    intro: "Le camere di cui gli agenti possono vedere l'immagine attuale.",
+    help: ["Se non ne scegli nessuna, gli agenti sanno comunque chi c'è e cosa è successo, ma non vedono mai un'immagine."],
+    label: "Camere con le immagini per gli agenti",
+  },
+};

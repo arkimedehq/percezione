@@ -1,0 +1,33 @@
+# NVIDIA GPU (amd64): docker compose -f docker-compose.yml -f hardware/nvidia.yml up -d
+# Needs the NVIDIA driver and the NVIDIA Container Toolkit on the host.
+# Frigate's -tensorrt image has no detection model: frigate-model builds YOLOv9 (t, 320) once, on this machine,
+# with the commands of Frigate's docs, and leaves it in frigate/config/model_cache/yolo.onnx.
+services:
+  setup:
+    environment:
+      PERCEZIONE_HARDWARE: nvidia
+
+  frigate-model:
+    build:
+      context: hardware
+      dockerfile: yolov9.Dockerfile
+      args:
+        MODEL_SIZE: ${YOLO_MODEL_SIZE:-t}
+        IMG_SIZE: ${YOLO_IMG_SIZE:-320}
+    image: percezione-frigate-model:yolov9-${YOLO_MODEL_SIZE:-t}-${YOLO_IMG_SIZE:-320}
+    restart: "no"
+    volumes:
+      - ./frigate/config:/config
+
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:0.18.0-tensorrt
+    depends_on:
+      frigate-model:
+        condition: service_completed_successfully
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

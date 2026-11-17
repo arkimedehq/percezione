@@ -1,0 +1,12 @@
+# Intel GPU or NPU (OpenVINO, 6th gen and newer): docker compose -f docker-compose.yml -f hardware/intel.yml up -d
+# Detection on the Intel GPU (SSDLite MobileNet v2, already in Frigate's image) and video decoding on it (VAAPI).
+# Only the Intel render node goes to Frigate: with an NVIDIA card too (e.g. for Ollama, hardware/ollama-nvidia.yml),
+# `ls -l /dev/dri/by-path` shows which renderD… is Intel's (PCI 00:02.0); set INTEL_RENDER_DEVICE if it is not 128.
+services:
+  setup:
+    environment:
+      PERCEZIONE_HARDWARE: intel
+
+  frigate:
+    devices:
+      - ${INTEL_RENDER_DEVICE:-/dev/dri/renderD128}:/dev/dri/renderD128

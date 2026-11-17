@@ -1,0 +1,97 @@
+# Tests on every push and pull request: service, frontend, posture runner, Arkimede plugin, Compose files, image.
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: perception-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: perception-service/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            perception-service/package-lock.json
+            frontend/package-lock.json
+      # the frontend imports the service's types
+      - run: npm ci
+        working-directory: perception-service
+      - run: npm ci && npm run build
+        working-directory: frontend
+
+  onnx-runner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      # the posture test needs RTMPose (~50 MB, checked by sha256)
+      - run: sh analyzers/models/pose/fetch.sh
+      - run: uv run pytest -q
+        working-directory: analyzers/onnx-runner
+
+  arkimede-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s integrations/arkimede/tests
+
+  compose:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: deploy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compose files are valid for every hardware and profile
+        run: |
+          for hw in "" nvidia intel coral "intel ollama-nvidia"; do
+            files="-f docker-compose.yml"
+            for f in $hw; do files="$files -f hardware/$f.yml"; done
+            docker compose $files --profile vlm --profile pose config -q
+            echo "${hw:-cpu}: ok"
+          done
+
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Tests inside the image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: The image itself
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          cache-from: type=gha

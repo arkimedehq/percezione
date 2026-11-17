@@ -1,0 +1,63 @@
+# Percezione (camera-recognition) for Arkimede: the MCP server to ask the cameras, and a daemon that brings live
+# events and presence. Percezione knows nothing of Arkimede: this package only uses its generic outputs (/mcp, /events).
+contract: 1
+name: camera-recognition
+version: 0.4.2
+label: Percezione
+audience: personal              # it writes what happens at home into its owner's memory
+description: >
+  The home's cameras: who is in which room, people passing in the street, someone at the door, objects left at the
+  entrance. Presence and memories reach the agent; Percezione's rules decide what is notified or said.
+author: Andrea Genovese
+license: MIT
+homepage: https://github.com/arkimedehq/percezione
+
+settings:
+  - { key: PERCEZIONE_URL, required: true, description: "Percezione's address on the LAN, e.g. http://192.0.2.10:8090" }
+  - { key: PERCEZIONE_TOKEN, required: true, secret: true, description: "A token from Percezione's Agents page" }
+  - { key: OUTDOOR_PLACES, default: outdoor, description: "Places that are outside the home (comma-separated): no presence there" }
+  - { key: PRESENCE_POLL_S, default: "60", description: "Seconds between two readings of who is where" }
+  - { key: LATE_AFTER_S, default: "120", description: "An event older than this (replayed after a stop) only reaches the memory" }
+  - { key: ASK_AS, default: percezione, description: "Who asks the agent to notify (People: an id marked authorized, so the agent can use its tools)" }
+
+contributes:
+  skills: [skills/percezione]
+  mcp:
+    - name: percezione
+      description: Ask the home's cameras who is where, what happened, and (when allowed) see a camera.
+      transport: http
+      url: "${PERCEZIONE_URL}/mcp"
+      headers: { Authorization: "Bearer ${PERCEZIONE_TOKEN}" }
+  daemons:
+    - { skill: percezione, script: scripts/bridge.py }
+
+events:
+  - name: person.arrived
+    description: A recognized person appeared after an absence.
+    schema: &event
+      type: object
+      required: [event_id, camera, place, text, importance]
+      properties:
+        event_id: { type: string }
+        camera: { type: string }
+        place: { type: string }
+        person: { type: [string, "null"] }
+        confidence: { type: [number, "null"] }
+        text: { type: string }
+        importance: { type: string, enum: [low, normal, high] }
+        from: { type: [string, "null"] }
+        to: { type: [string, "null"] }
+        zone: { type: string }
+        people: { type: array, items: { type: string } }
+        unrecognized: { type: integer }
+  - { name: person.left, description: A recognized person has not been seen for a while., schema: *event }
+  - { name: activity.changed, description: A person's activity changed (data.from → data.to)., schema: *event }
+  - { name: posture.changed, description: A person's posture changed (data.from → data.to)., schema: *event }
+  - { name: street.passage, description: Someone walked by in the street (person null when not recognized)., schema: *event }
+  - { name: entrance.approach, description: Someone came to the entrance., schema: *event }
+  - { name: object.left, description: An object was left in a watched zone (data.to is what)., schema: *event }
+  - { name: external.event, description: "A device said something happened at a camera (data.to is the kind: ring, call, …); data.people are everyone recognized.", schema: *event }
+
+people: { skill: percezione, script: scripts/people.py }   # the face library, for the People card
+
+services: [presence.report, perceive, notify, say, agent.ask]

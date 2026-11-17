@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- the eye of the header (src/App.tsx, Brand) on the dark ground, readable on light and dark tabs -->
+  <rect width="32" height="32" rx="7" fill="#141a21"/>
+  <g fill="none" stroke="#7DB4FF" stroke-width="2.4" transform="translate(4 4)">
+    <circle cx="12" cy="12" r="3.4"/>
+    <path d="M1.5 12s3.8-7 10.5-7 10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12z"/>
+  </g>
+</svg>

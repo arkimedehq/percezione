@@ -1,0 +1,4 @@
+**/*.onnx
+**/tokenizer.json
+**/.venv/
+**/__pycache__/

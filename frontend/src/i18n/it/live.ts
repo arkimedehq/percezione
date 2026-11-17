@@ -1,0 +1,37 @@
+import type { live as en } from "../en/live.ts";
+
+export const live: typeof en = {
+  title: "Live",
+  listening: "in ascolto: i nuovi eventi compaiono in cima",
+  help: [
+    "Tutto quello che notano le camere, mentre succede. Clicca una foto per ingrandirla; le foto ci sono solo per le camere che conservano le istantanee.",
+    "Sotto ogni evento: le camere, come è stata riconosciuta la persona (volto, con la sua sicurezza, o nome ereditato: tenuto da quando il volto era visibile), la zona e il ritardo in secondi.",
+    "Strada e ingresso: passaggi, avvicinamenti e oggetti lasciati. Sconosciuti: persone non riconosciute.",
+  ],
+  unreachable: "servizio non raggiungibile",
+  filters: "Filtri",
+  filter: {
+    all: "Tutti",
+    home: "In casa",
+    street: "Strada e ingresso",
+    reactions: "Con reazioni",
+    unknown: "Sconosciuti",
+  },
+  emptyTitle: "Ancora nessun evento",
+  emptyText: "Gli eventi compaiono qui appena una camera nota qualcuno.",
+  emptyFilteredTitle: "Niente per questo filtro",
+  emptyFilteredText: "Prova un altro filtro, o Tutti.",
+  inheritedName: "nome ereditato",
+  face: "volto",
+  from: (value) => `da ${value}`,
+  zone: (zone) => `zona ${zone}`,
+  after: "dopo",
+  before: "prima",
+  nOfM: (i, n) => `${i} di ${n}`,
+  unknownPerson: "Persona sconosciuta",
+  faces: "Volti",
+  openPhoto: "Apri la foto dell'evento",
+  photos: "Foto dell'evento",
+  close: "Chiudi",
+  photoAlt: "foto dell'evento",
+};

@@ -1,0 +1,61 @@
+{
+  "vocabulary": {
+    "at_computer": "sitting at a monitor, hands on keyboard or mouse",
+    "on_phone_call": "phone held to the ear, in a call",
+    "using_phone": "phone in hand in front of them, looking at its screen",
+    "eating": "food or a plate in front of them, bringing food to the mouth",
+    "cooking": "at the stove or the kitchen counter, preparing food",
+    "reading": "a book, magazine or papers in hand, looking at them",
+    "watching_tv": "sitting or lying, facing a TV that is on",
+    "playing": "playing with toys, a board game or with other people",
+    "sleeping": "lying down, eyes closed, still",
+    "resting": "lying on the sofa or an armchair, awake, doing nothing else",
+    "at_car": "next to a car: getting in or out, opening the trunk, loading, plugging in the charging cable",
+    "other": "a clearly visible activity that is not in this list",
+    "uncertain": "the person is barely visible, from behind or covered: what they are doing cannot be told"
+  },
+  "attributes": {
+    "person_visible": "a person is clearly visible, and so is what they are doing with their hands",
+    "phone_at_ear": "holds a phone close to the ear",
+    "phone_in_hand": "holds a smartphone in hand",
+    "looking_at_phone": "is looking at the phone in their hand",
+    "hands_on_keyboard_or_mouse": "both hands are on a keyboard or a mouse",
+    "facing_monitor": "sits in front of a monitor, facing the screen",
+    "lying_down": "is lying on a sofa, an armchair or elsewhere",
+    "eyes_closed": "has the eyes closed",
+    "facing_tv": "sits or lies on a sofa or an armchair, facing the TV",
+    "reading_paper": "holds a book, a magazine or papers and looks at them",
+    "at_table_with_food": "sits at a table with plates or food in front of them",
+    "at_stove": "stands at the stove or the kitchen counter, hands busy",
+    "playing_games": "plays with toys, a board game or with other people",
+    "near_car": "is next to a car and using it: getting in or out, opening the trunk, loading or unloading, plugging in the charging cable"
+  },
+  "rules": {
+    "indoor": {
+      "rules": [
+        { "if": { "person_visible": false }, "then": "uncertain" },
+        { "if": { "phone_at_ear": true }, "then": "on_phone_call" },
+        { "if": { "lying_down": true, "eyes_closed": true }, "then": "sleeping" },
+        { "if": { "phone_in_hand": true, "looking_at_phone": true }, "then": "using_phone" },
+        { "if": { "hands_on_keyboard_or_mouse": true }, "then": "at_computer" },
+        { "if": { "facing_monitor": true }, "then": "at_computer" },
+        { "if": { "reading_paper": true }, "then": "reading" },
+        { "if": { "at_table_with_food": true }, "then": "eating" },
+        { "if": { "at_stove": true }, "then": "cooking" },
+        { "if": { "playing_games": true }, "then": "playing" },
+        { "if": { "facing_tv": true }, "then": "watching_tv" },
+        { "if": { "lying_down": true }, "then": "resting" }
+      ],
+      "default": "other"
+    },
+    "outdoor": {
+      "rules": [
+        { "if": { "person_visible": false }, "then": "uncertain" },
+        { "if": { "phone_at_ear": true }, "then": "on_phone_call" },
+        { "if": { "phone_in_hand": true, "looking_at_phone": true }, "then": "using_phone" },
+        { "if": { "near_car": true }, "then": "at_car" }
+      ],
+      "default": "other"
+    }
+  }
+}

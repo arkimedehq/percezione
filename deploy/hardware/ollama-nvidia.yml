@@ -1,0 +1,13 @@
+# Ollama on the NVIDIA GPU, with the "vlm" profile. Combine it with the hardware Frigate uses, e.g. Frigate on the
+# Intel GPU and the whole NVIDIA card for the vision model:
+#   docker compose -f docker-compose.yml -f hardware/intel.yml -f hardware/ollama-nvidia.yml --profile vlm up -d
+# Needs the NVIDIA driver and the NVIDIA Container Toolkit on the host.
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

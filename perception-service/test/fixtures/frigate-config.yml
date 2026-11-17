@@ -1,0 +1,153 @@
+# Frigate 0.18.0 — config for the perception test (syntax checked against docs/configuration/advanced/reference.md @ v0.18.0)
+
+mqtt:
+  enabled: true
+  host: '{FRIGATE_MQTT_HOST}'
+  port: 1883
+  topic_prefix: frigate
+  client_id: frigate-macbook
+  user: '{FRIGATE_MQTT_USER}'
+  password: '{FRIGATE_MQTT_PASSWORD}'
+
+detectors:
+  cpu1:
+    type: cpu
+
+objects:
+  track:
+    - person
+
+record:
+  enabled: false
+
+snapshots:
+  enabled: false
+
+face_recognition:
+  enabled: true
+  model_size: large  # ArcFace: fewer mix-ups between relatives than small
+  # ArcFace gives lower scores: at 0.9 (default) Alice passed in 37 crops out of 62, at 0.85 in 52; no wrong name above 0.8
+  recognition_threshold: 0.85
+
+cameras:
+  # The camera name is the "room" passed to the VLM
+  attic:
+    ffmpeg:
+      inputs:
+        # Hikvision main stream 1920x1080 H.264: on the 704x576 substream faces were ~35x57 px, too small
+        # for recognition. Resolutions are fixed on the camera, do not change them: an NVR is recording.
+        - path: 
+            rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{FRIGATE_RTSP_HOST}:554/Streaming/Channels/101
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 1920
+      height: 1080
+      fps: 5
+    # No images on the broker: metadata only (frigate/<camera>/<object>/snapshot disabled)
+    mqtt:
+      enabled: false
+  front_right:
+    ffmpeg:
+      inputs:
+        - path: 
+            rtsp://{FRIGATE_CAM2_USER}:{FRIGATE_CAM2_PASSWORD}@{FRIGATE_CAM2_HOST}:554/Streaming/Channels/101
+          input_args: preset-rtsp-restream
+          roles: [detect]
+    detect:
+      enabled: true
+      width: 2688     # the real stream resolution
+      height: 1520
+      fps: 5
+    # one photo per tracked person, on disk only (never on MQTT): to see who passed by
+    # (source_event_id of the passages → /api/events/<id>/snapshot.jpg or Explore in the UI)
+    snapshots:
+      enabled: true
+      bounding_box: true
+      retain:
+        default: 7
+    # text overlaid by the camera: the clock changes every second and would trigger empty detections
+    motion:
+      mask:
+        timestamp:
+          friendly_name: Camera date and time
+          coordinates: 0.015,0.035,0.310,0.035,0.310,0.110,0.015,0.110
+        camera_name:
+          friendly_name: Camera name
+          coordinates: 0.715,0.870,0.860,0.870,0.860,0.940,0.715,0.940
+    # sidewalk from the entrance step to the garage (the bottom-center point of the box counts: the feet).
+    # The perception-service emits `approach` when a person enters it.
+    zones:
+      entrance:
+        coordinates: 0.523,0.288,0.597,0.289,0.559,0.742,0.431,0.742
+        objects: person
+        enabled: true
+        inertia: 3
+        loitering_time: 0
+    mqtt:
+      enabled: false  # no images on the broker
+  front_left:
+    # Hikvision DS-2CD2346G2-I "Front left" (192.0.2.92), main stream 2688x1520
+    ffmpeg:
+      inputs:
+        - path: 
+            rtsp://{FRIGATE_CAM3_USER}:{FRIGATE_CAM3_PASSWORD}@{FRIGATE_CAM3_HOST}:554/Streaming/Channels/101
+          input_args: preset-rtsp-restream
+          roles: [detect]
+    detect:
+      enabled: true
+      width: 2688
+      height: 1520
+      fps: 5
+    # one photo per tracked person, on disk only (never on MQTT): to see who passed by
+    # (source_event_id of the passages → /api/events/<id>/snapshot.jpg or Explore in the UI)
+    snapshots:
+      enabled: true
+      bounding_box: true
+      retain:
+        default: 7
+    # text overlaid by the camera: the clock changes every second and would trigger empty detections
+    motion:
+      mask:
+        timestamp:
+          friendly_name: Camera date and time
+          coordinates: 0.015,0.035,0.310,0.035,0.310,0.110,0.015,0.110
+        camera_name:
+          friendly_name: Camera name
+          coordinates: 0.715,0.870,0.860,0.870,0.860,0.940,0.715,0.940
+    # sidewalk from the entrance step to the garage (the bottom-center point of the box counts: the feet).
+    # The perception-service emits `approach` when a person enters it.
+    zones:
+      entrance:
+        coordinates: 0.287,0.385,0.384,0.385,0.536,1,0.361,1
+        objects: person
+        enabled: true
+        inertia: 3
+        loitering_time: 0
+    mqtt:
+      enabled: false  # no images on the broker
+  living_room:
+    # 192.0.2.93, main stream 1920x1080 (room name to be decided)
+    ffmpeg:
+      inputs:
+        - path: 
+            rtsp://{FRIGATE_CAM4_USER}:{FRIGATE_CAM4_PASSWORD}@{FRIGATE_CAM4_HOST}:554/Streaming/Channels/101
+          input_args: preset-rtsp-restream
+          roles: [detect]
+    detect:
+      enabled: true
+      width: 1920
+      height: 1080
+      fps: 5
+    mqtt:
+      enabled: false  # no images on the broker
+version: 0.18-0
+
+# Debug face recognition (remove once the test is over)
+logger:
+  default: info
+  logs:
+    frigate.data_processing.real_time.face: debug
+    frigate.embeddings.maintainer: debug

@@ -1,0 +1,29 @@
+{
+  "name": "perception-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "test": "tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "capture": "tsx scripts/capture.ts",
+    "bench": "tsx scripts/bench.ts",
+    "frigate:diff": "tsx scripts/frigate-diff.ts",
+    "bench:posture": "tsx scripts/bench-posture.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "mqtt": "^5.16.0",
+    "sharp": "^0.35.5",
+    "ws": "^8.22.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/ws": "^8.18.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

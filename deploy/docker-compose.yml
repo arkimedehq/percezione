@@ -1,0 +1,155 @@
+# Percezione: cameras, people and activities on top of Frigate.
+#
+#   docker compose up -d                                   # CPU, any machine (amd64, arm64)
+#   docker compose -f docker-compose.yml -f hardware/nvidia.yml up -d   # or intel.yml, coral.yml
+#   docker compose --profile vlm up -d                     # + Ollama, for activities (optional)
+#   docker compose --profile pose up -d                    # + posture model (optional)
+#
+# Then open http://<this machine>:8090 and follow the first start. Nothing to fill in beforehand: the `setup` service
+# creates the secrets (data/secrets, mode 600) and the base configuration of Frigate, go2rtc and Mosquitto, once.
+# Optional settings are in .env.example.
+
+name: percezione
+
+x-percezione: &percezione
+  image: ${PERCEZIONE_IMAGE:-ghcr.io/arkimedehq/percezione:0.1.0}
+  build:
+    context: ..
+  environment: &percezione-env
+    TZ: ${TZ:-UTC}
+    FRIGATE_URL: http://frigate:5000
+    MQTT_HOST: ${MQTT_HOST:-mosquitto}
+    MQTT_PORT: ${MQTT_PORT:-1883}
+    GO2RTC_API_URL: http://go2rtc:1984
+    # how Frigate reads the cameras: its login comes from its Docker secrets, written as {FRIGATE_…} in config.yml
+    GO2RTC_RTSP_URL: "rtsp://{FRIGATE_GO2RTC_USER}:{FRIGATE_GO2RTC_PASSWORD}@go2rtc:8554"
+    OLLAMA_URL: ${OLLAMA_URL:-http://ollama:11434}
+    PERCEZIONE_HOSTS: ${PERCEZIONE_HOSTS:-}
+
+services:
+  # Runs once before the others: secrets, Frigate's config.yml, go2rtc.yaml, Mosquitto's passwords. Root only here,
+  # to give the folders to the service's user; it never overwrites what is already there.
+  setup:
+    <<: *percezione
+    user: "0"
+    command: ["node", "src/setup.js"]
+    restart: "no"
+    environment:
+      <<: *percezione-env
+      PERCEZIONE_HARDWARE: cpu  # hardware/*.yml change it: it picks Frigate's detector
+    volumes:
+      - ./data:/app/data
+      - ./frigate/config:/app/frigate/config
+
+  percezione:
+    <<: *percezione
+    restart: unless-stopped
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+      mosquitto:
+        condition: service_started
+      go2rtc:
+        condition: service_started
+      frigate:
+        condition: service_started
+    volumes:
+      - ./data:/app/data
+      # Frigate's face pictures and storage: people's faces and the Usage page
+      - ./frigate/storage:/app/frigate/storage:ro
+      # Frigate's downloaded models: a Frigate started before its face models is restarted (src/face-models.ts)
+      - ./frigate/config/model_cache:/app/frigate/config/model_cache:ro
+      # the last seconds of the cameras, in RAM: bitrate × (before_s + ~2 s) per camera. A ceiling, not a
+      # reservation: what is used depends on the groups' settings in the UI
+      - type: tmpfs
+        target: /app/buffer
+        tmpfs:
+          size: 1073741824
+          # a new tmpfs belongs to root; the service runs as node
+          mode: 0o1777
+    environment:
+      <<: *percezione-env
+      BUFFER_DIR: /app/buffer
+    ports:
+      - "${PERCEZIONE_PORT:-8090}:8090"       # UI and API
+      - "${FRIGATE_UI_PORT:-8091}:8091"       # Frigate's UI, behind Percezione's login
+
+  # One connection per camera; Frigate, the live video and (sharing on) other apps read from here. Its go2rtc.yaml is
+  # written by Percezione; the passwords (its login, the cameras') are files in credentials/, which go2rtc masks as ***
+  # in its logs. It keeps the cameras up while Frigate restarts.
+  go2rtc:
+    image: alexxit/go2rtc:1.9.14
+    restart: unless-stopped
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    volumes:
+      - ./data/go2rtc:/config
+    environment:
+      TZ: ${TZ:-UTC}
+      CREDENTIALS_DIRECTORY: /config/credentials
+    ports:
+      - "${GO2RTC_RTSP_PORT:-8554}:8554"           # RTSP, behind the login: for other apps when sharing is on
+      - "${GO2RTC_WEBRTC_PORT:-8555}:8555/tcp"     # WebRTC, only when sharing is on
+      - "${GO2RTC_WEBRTC_PORT:-8555}:8555/udp"
+
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:0.18.0
+    restart: unless-stopped
+    shm_size: ${FRIGATE_SHM_SIZE:-512mb}  # about 128 MB per camera at 1080p
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    volumes:
+      - ./frigate/config:/config
+      - ./frigate/storage:/media/frigate
+      # FRIGATE_* files: the MQTT and go2rtc logins used in config.yml as {FRIGATE_…}
+      - ./data/secrets/frigate:/run/secrets:ro
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+      # recent face recognition attempts ("to name", the best faces of a ring) in RAM: save_attempts × ~20 KB. A
+      # ceiling, not a reservation
+      - type: tmpfs
+        target: /media/frigate/clips/faces/train
+        tmpfs:
+          size: 268435456
+    environment:
+      TZ: ${TZ:-UTC}
+    # no ports: the API and UI are reached through Percezione
+
+  # Events between Frigate and Percezione; only inside this network. With a broker of your own (e.g. Home
+  # Assistant's), set MQTT_HOST in .env: this one keeps running, unused.
+  mosquitto:
+    image: eclipse-mosquitto:2.0.22
+    restart: unless-stopped
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      # owned by Mosquitto's user (1883), set by setup; on Docker Desktop for Mac it still warns: owners are simulated
+      - ./data/secrets/mosquitto:/mosquitto/secrets:ro
+
+  # Optional: a vision-language model for activities ("vlm" profile). Choose the model in Percezione's UI.
+  ollama:
+    image: ollama/ollama:0.35.1
+    profiles: [vlm]
+    restart: unless-stopped
+    volumes:
+      - ./data/ollama:/root/.ollama
+
+  # Optional: the ONNX analyzers ("pose" profile): posture (RTMPose) and, with ONNX_MODELS="pose clip", CLIP for
+  # left objects.
+  onnx-runner:
+    image: ${ONNX_RUNNER_IMAGE:-ghcr.io/arkimedehq/percezione-onnx-runner:0.1.0}
+    build:
+      context: ../analyzers
+      dockerfile: onnx-runner/Dockerfile
+    profiles: [pose]
+    restart: unless-stopped
+    environment:
+      FETCH_MODELS: ${ONNX_MODELS:-pose}
+    volumes:
+      - ./data/models:/models

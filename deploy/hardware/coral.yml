@@ -1,0 +1,12 @@
+# Google Coral USB: docker compose -f docker-compose.yml -f hardware/coral.yml up -d
+# Frigate's standard image already has the model. For a PCIe/M.2 Coral, replace the device with /dev/apex_0 and
+# set CORAL_DEVICE=pci in .env.
+services:
+  setup:
+    environment:
+      PERCEZIONE_HARDWARE: coral
+      CORAL_DEVICE: ${CORAL_DEVICE:-usb}
+
+  frigate:
+    devices:
+      - /dev/bus/usb:/dev/bus/usb

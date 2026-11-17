@@ -1,0 +1,14 @@
+# only what the image needs: never secrets, data or Frigate's files
+**
+!Dockerfile
+!perception-service/package.json
+!perception-service/package-lock.json
+!perception-service/tsconfig.json
+!perception-service/src/
+!perception-service/test/
+!perception-service/scripts/
+!perception-service/config/
+!frontend/
+frontend/node_modules/
+frontend/dist/
+.env*

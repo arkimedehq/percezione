@@ -1,0 +1,30 @@
+# CLIP ViT-B/32 (OpenAI, MIT), Xenova's int8-quantized ONNX. Zero-shot: the label is the phrase most similar to
+# the image. Phrases are in English (CLIP was trained in English); they can also be passed in params.prompts.
+# Weights: ./fetch.sh (not versioned).
+name: clip
+task: zero_shot_classification
+family: clip
+files: { vision: vision.onnx, text: text.onnx, tokenizer: tokenizer.json }
+input:
+  width: 224
+  height: 224
+  # a wide crop around the person: the context (sofa, table, monitor) is the main clue
+  padding: 2.0
+  mean: [122.771, 116.746, 104.094]
+  std: [68.501, 66.632, 70.323]
+  channels: RGB
+logit_scale: 100
+# label → phrases; a label's score is the mean of its phrases
+prompts:
+  watching_tv: ["a photo of a person watching tv on a sofa", "a person sitting on a couch looking at a television"]
+  using_phone: ["a photo of a person looking at a smartphone in their hands"]
+  on_phone_call: ["a photo of a person talking on the phone, holding it to the ear"]
+  reading: ["a photo of a person reading a book", "a person reading a magazine"]
+  eating: ["a photo of a person eating at a table", "a person having a meal"]
+  cooking: ["a photo of a person cooking in a kitchen at the stove"]
+  at_computer: ["a photo of a person working at a computer with keyboard and mouse"]
+  sleeping: ["a photo of a person sleeping lying down with eyes closed"]
+  resting: ["a photo of a person lying on a sofa relaxing"]
+  playing: ["a photo of a child playing with toys", "people playing a board game"]
+  walking: ["a photo of a person walking through a room"]
+outputs: [watching_tv, using_phone, on_phone_call, reading, eating, cooking, at_computer, sleeping, resting, playing, walking]

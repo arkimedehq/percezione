@@ -1,0 +1,28 @@
+# RTMPose-m (OpenMMLab, Apache 2.0), body7, 17 COCO keypoints, input 256x192.
+# Top-down: works on the person's crop (Frigate's box passed in params.box).
+# Weights: ./fetch.sh (not versioned).
+name: pose
+task: pose_estimation
+family: rtmpose
+input:
+  width: 192
+  height: 256
+  # margin around the box, as in MMPose's pipeline.json
+  padding: 1.25
+  mean: [123.675, 116.28, 103.53]
+  std: [58.395, 57.12, 57.375]
+  channels: RGB
+simcc_split_ratio: 2.0
+labels: [nose, left_eye, right_eye, left_ear, right_ear, left_shoulder, right_shoulder, left_elbow, right_elbow,
+         left_wrist, right_wrist, left_hip, right_hip, left_knee, right_knee, left_ankle, right_ankle]
+# From keypoints to posture (analyzers/onnx-runner/posture.py). Angles in degrees from the image's vertical.
+# "lying" only means a horizontal body: whether on the sofa or on the floor is decided by the service with zones.
+derive:
+  posture:
+    min_score: 0.3          # keypoints below this confidence do not count
+    lying_torso_deg: 55     # torso tilted more than this: lying
+    upright_torso_deg: 30  # torso between this and lying_torso_deg: reclined against a backrest, seated
+    sitting_thigh_deg: 50   # thigh tilted more than this (upright torso): sitting
+    lying_aspect: 1.4       # without reliable keypoints: a box wider than tall by this much = lying
+    lying_min_aspect: 0.9  # horizontal torso in a taller box: bent or leaning, not lying
+outputs: [standing, sitting, lying, uncertain]

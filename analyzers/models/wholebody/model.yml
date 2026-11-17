@@ -1,0 +1,161 @@
+# RTMW-m (OpenMMLab, Apache 2.0): RTMPose WholeBody, 133 COCO-WholeBody keypoints (body, feet, face, hands), 256x192.
+# Top-down on Frigate's box. Weights: ./fetch.sh (not versioned).
+name: wholebody
+task: pose_estimation
+family: rtmpose
+input:
+  width: 192
+  height: 256
+  padding: 1.25
+  mean: [123.675, 116.28, 103.53]
+  std: [58.395, 57.12, 57.375]
+  channels: RGB
+simcc_split_ratio: 2.0
+labels:
+  - nose
+  - left_eye
+  - right_eye
+  - left_ear
+  - right_ear
+  - left_shoulder
+  - right_shoulder
+  - left_elbow
+  - right_elbow
+  - left_wrist
+  - right_wrist
+  - left_hip
+  - right_hip
+  - left_knee
+  - right_knee
+  - left_ankle
+  - right_ankle
+  - left_big_toe
+  - left_small_toe
+  - left_heel
+  - right_big_toe
+  - right_small_toe
+  - right_heel
+  - face_0
+  - face_1
+  - face_2
+  - face_3
+  - face_4
+  - face_5
+  - face_6
+  - face_7
+  - face_8
+  - face_9
+  - face_10
+  - face_11
+  - face_12
+  - face_13
+  - face_14
+  - face_15
+  - face_16
+  - face_17
+  - face_18
+  - face_19
+  - face_20
+  - face_21
+  - face_22
+  - face_23
+  - face_24
+  - face_25
+  - face_26
+  - face_27
+  - face_28
+  - face_29
+  - face_30
+  - face_31
+  - face_32
+  - face_33
+  - face_34
+  - face_35
+  - face_36
+  - face_37
+  - face_38
+  - face_39
+  - face_40
+  - face_41
+  - face_42
+  - face_43
+  - face_44
+  - face_45
+  - face_46
+  - face_47
+  - face_48
+  - face_49
+  - face_50
+  - face_51
+  - face_52
+  - face_53
+  - face_54
+  - face_55
+  - face_56
+  - face_57
+  - face_58
+  - face_59
+  - face_60
+  - face_61
+  - face_62
+  - face_63
+  - face_64
+  - face_65
+  - face_66
+  - face_67
+  - left_hand_0
+  - left_hand_1
+  - left_hand_2
+  - left_hand_3
+  - left_hand_4
+  - left_hand_5
+  - left_hand_6
+  - left_hand_7
+  - left_hand_8
+  - left_hand_9
+  - left_hand_10
+  - left_hand_11
+  - left_hand_12
+  - left_hand_13
+  - left_hand_14
+  - left_hand_15
+  - left_hand_16
+  - left_hand_17
+  - left_hand_18
+  - left_hand_19
+  - left_hand_20
+  - right_hand_0
+  - right_hand_1
+  - right_hand_2
+  - right_hand_3
+  - right_hand_4
+  - right_hand_5
+  - right_hand_6
+  - right_hand_7
+  - right_hand_8
+  - right_hand_9
+  - right_hand_10
+  - right_hand_11
+  - right_hand_12
+  - right_hand_13
+  - right_hand_14
+  - right_hand_15
+  - right_hand_16
+  - right_hand_17
+  - right_hand_18
+  - right_hand_19
+  - right_hand_20
+derive:
+  posture:
+    min_score: 0.3
+    lying_torso_deg: 55
+    upright_torso_deg: 30  # torso between this and lying_torso_deg: reclined against a backrest, seated
+    sitting_thigh_deg: 50
+    lying_aspect: 1.4
+    lying_min_aspect: 0.9  # horizontal torso in a taller box: bent or leaning, not lying
+  # where the hands are relative to the head, in shoulder widths (analyzers/onnx-runner/posture.py: gestures)
+  gestures:
+    min_score: 0.3
+    ear: 0.6        # a hand closer than this to an ear: on the phone
+    face: 0.7       # a hand closer than this to the nose: hand at the face (eating, drinking, touching the face)
+outputs: [standing, sitting, lying, uncertain]

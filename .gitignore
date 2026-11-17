@@ -1,0 +1,16 @@
+.env
+node_modules/
+dist/
+data/
+frigate/storage/
+# Frigate's config.yml and its runtime state (db, jwt, backup, cache)
+frigate/config/
+.idea/
+
+# modelli ONNX: pesi scaricati, non versionati (vedi analyzers/models/*/fetch.sh)
+analyzers/models/*/*.onnx
+analyzers/models/*/tokenizer.json
+.venv/
+__pycache__/
+# backups of .env (secrets)
+.env.before-*

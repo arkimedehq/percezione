@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/*
+ * Colors are tokens: the utilities (bg-surface, text-muted…) read these variables, so a theme only redefines them.
+ * Dark is the default; light comes from the system or from the viewer's choice (data-theme on <html>).
+ * Video areas stay dark in both themes.
+ */
+@theme {
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-display: "Space Grotesk", Inter, sans-serif;
+  --color-ground: #0e1116;
+  --color-surface: #141a21;
+  --color-raised: #1c2530;
+  --color-selected: #1a2330;
+  --color-line: #222a33;
+  --color-line-strong: #2d3743;
+  --color-ink: #e6edf3;
+  --color-muted: #a7b1bc;
+  --color-dim: #8b96a2;
+  --color-accent: #3d8bff;
+  --color-accent-strong: #5a9dff;
+  --color-on-accent: #08111f;
+  --color-accent-soft: #16253a;
+  --color-accent-soft-strong: #1b2e48;
+  --color-accent-ink: #cfe2ff;
+  --color-amber: #f2a33a;
+  --color-amber-soft: #2a1f0f;
+  --color-amber-line: #6b4a16;
+  --color-amber-ink: #ffd9a3;
+  --color-ok: #3fb97f;
+  --color-ok-soft: #13261d;
+  --color-ok-ink: #9be3bf;
+  --color-ko: #f25f5c;
+  --color-ko-soft: #2a1515;
+  --color-ko-ink: #ffb4b0;
+  --color-video: #0a0d11;
+  --color-scrim: #05070a;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --color-ground: #f4f6f9;
+    --color-surface: #ffffff;
+    --color-raised: #edf0f4;
+    --color-selected: #e3e9f2;
+    --color-line: #e1e5eb;
+    --color-line-strong: #cbd2db;
+    --color-ink: #121821;
+    --color-muted: #4a5563;
+    --color-dim: #626d7a;
+    --color-accent: #1f6feb;
+    --color-accent-strong: #1a5fd0;
+    --color-on-accent: #ffffff;
+    --color-accent-soft: #e8f0fe;
+    --color-accent-soft-strong: #d6e4fd;
+    --color-accent-ink: #1747a6;
+    --color-amber: #c77700;
+    --color-amber-soft: #fff4e2;
+    --color-amber-line: #f0c27a;
+    --color-amber-ink: #7a4500;
+    --color-ok: #1a8a50;
+    --color-ok-soft: #e4f6ec;
+    --color-ok-ink: #11653a;
+    --color-ko: #d93836;
+    --color-ko-soft: #fdeceb;
+    --color-ko-ink: #a51f1d;
+    --color-scrim: #1a2230;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --color-ground: #f4f6f9;
+      --color-surface: #ffffff;
+      --color-raised: #edf0f4;
+      --color-selected: #e3e9f2;
+      --color-line: #e1e5eb;
+      --color-line-strong: #cbd2db;
+      --color-ink: #121821;
+      --color-muted: #4a5563;
+      --color-dim: #626d7a;
+      --color-accent: #1f6feb;
+      --color-accent-strong: #1a5fd0;
+      --color-on-accent: #ffffff;
+      --color-accent-soft: #e8f0fe;
+      --color-accent-soft-strong: #d6e4fd;
+      --color-accent-ink: #1747a6;
+      --color-amber: #c77700;
+      --color-amber-soft: #fff4e2;
+      --color-amber-line: #f0c27a;
+      --color-amber-ink: #7a4500;
+      --color-ok: #1a8a50;
+      --color-ok-soft: #e4f6ec;
+      --color-ok-ink: #11653a;
+      --color-ko: #d93836;
+      --color-ko-soft: #fdeceb;
+      --color-ko-ink: #a51f1d;
+      --color-scrim: #1a2230;
+    }
+  }
+}
+
+html, body, #root { min-height: 100%; }
+body { margin: 0; background: var(--color-ground); color: var(--color-ink); font-family: var(--font-sans); }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }

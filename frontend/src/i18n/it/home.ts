@@ -1,0 +1,32 @@
+import type { home as en } from "../en/home.ts";
+
+export const home: typeof en = {
+  title: "Home",
+  subtitle: "Chi c'è in casa e cosa è appena successo.",
+  help: [
+    "Chi è inquadrato adesso, per luogo: le persone riconosciute con attività e postura, e quante altre le camere vedono senza un nome.",
+    "Gli ultimi eventi si aggiornano in diretta; l'elenco completo con le foto è in Live.",
+    "Lo stato dice se camere, Frigate e uscite funzionano.",
+  ],
+  whoTitle: "Chi c'è",
+  whoUnavailable: "La presenza non è disponibile in questo momento.",
+  nobody: "Nessuno inquadrato",
+  nobodyText: "Le persone compaiono qui appena una camera le vede.",
+  unrecognized: (n) => (n === 1 ? "1 persona non riconosciuta" : `${n} persone non riconosciute`),
+  recentTitle: "Ultimi eventi",
+  allEvents: "Tutti gli eventi",
+  noEvents: "Ancora nessun evento",
+  noEventsText: "Gli eventi arrivano quando qualcuno entra, esce, passa o cambia attività.",
+  statusTitle: "Stato",
+  frigate: "Frigate",
+  running: (version) => `attivo · ${version}`,
+  unreachable: "non raggiungibile",
+  cameras: "Camere",
+  camerasLive: (live, total, off) => `${live} di ${total} attive` + (off ? ` · ${off} ${off === 1 ? "spenta" : "spente"}` : ""),
+  outputs: "Uscite",
+  outputsOk: "tutto consegnato",
+  outputsWaiting: (n) => (n === 1 ? "1 evento in attesa" : `${n} eventi in attesa`),
+  outputsFailing: (n) => (n === 1 ? "1 destinazione non risponde" : `${n} destinazioni non rispondono`),
+  rules: "Regole",
+  rulesActive: (n) => (n === 1 ? "1 attiva" : `${n} attive`),
+};

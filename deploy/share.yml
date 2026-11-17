@@ -1,0 +1,7 @@
+# go2rtc's API for other apps (e.g. a wall panel that checks the stream names), behind go2rtc's login:
+#   docker compose -f docker-compose.yml -f share.yml up -d     (with your hardware files too)
+# Turn sharing on in Percezione as well (Cameras → Sources): it shows the login and the addresses to give to the apps.
+services:
+  go2rtc:
+    ports:
+      - "${GO2RTC_API_PORT:-1984}:1984"

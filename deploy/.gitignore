@@ -1,0 +1,4 @@
+# what an installation creates: never versioned
+.env
+data/
+frigate/
