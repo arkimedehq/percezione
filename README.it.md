@@ -4,6 +4,8 @@
 
 *[English](README.md)*
 
+<p align="center"><img src="docs/images/percezione.svg" alt="Camere in ingresso, eventi sulle persone in uscita: chi è arrivato, chi è alla porta, cosa sta facendo qualcuno; verso Home Assistant, MQTT, webhook, Arkimede e Recordare" width="100%"></p>
+
 Percezione trasforma le camere IP in eventi sulle persone: chi è arrivato, chi è uscito, chi è alla porta, cosa fa
 qualcuno in una stanza, quando qualcuno passa fuori o lascia un pacco al cancello. Gira in locale sopra
 [Frigate](https://frigate.video) e [go2rtc](https://github.com/AlexxIT/go2rtc). Manda quello che vede a Home

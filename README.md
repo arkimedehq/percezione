@@ -4,6 +4,8 @@
 
 *[Italiano](README.it.md)*
 
+<p align="center"><img src="docs/images/percezione.svg" alt="Cameras in, events about people out: who arrived, who is at the door, what someone is doing; to Home Assistant, MQTT, webhooks, Arkimede and Recordare" width="100%"></p>
+
 Percezione turns IP cameras into events about people: who arrived, who left, who is at the door, what someone is
 doing in a room, when someone walks by outside or leaves a parcel at the gate. It runs locally on top of
 [Frigate](https://frigate.video) and [go2rtc](https://github.com/AlexxIT/go2rtc). It sends what it sees to Home
