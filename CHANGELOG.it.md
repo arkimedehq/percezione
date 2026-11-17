@@ -2,6 +2,11 @@
 
 *[English](CHANGELOG.md)*
 
+## 0.1.1
+
+- **Persone → Da nominare** mostra di nuovo le foto: dalla 0.1.0 ogni foto dei tentativi recenti di Frigate era
+  rifiutata (422), così i volti da nominare comparivano senza immagine.
+
 ## 0.1.0 — prima release pubblica
 
 Percezione trasforma le camere IP in eventi sulle persone, in locale, sopra Frigate e go2rtc.

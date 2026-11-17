@@ -232,6 +232,7 @@ test("face import API: token required, people created on purpose, the same photo
       return false;
     },
     remove: async (id: string) => void library.delete(id),
+    image: async (id: string, file: string) => new Response(`${id}/${file}`, { headers: { "Content-Type": "image/webp" } }),
   } as unknown as FrigateFaces;
   const { base, call } = await setup(t, { mcp: { tokens } as unknown as McpDeps, faces, faceImports: new FaceImports(join(dir, "people-imports.json")) });
   const auth = { Authorization: `Bearer ${token}` };
@@ -280,6 +281,12 @@ test("face import API: token required, people created on purpose, the same photo
   // a person's id is never a path
   assert.equal((await call("POST", "/api/people/Bob_Smith/merge", { into: "../train" })).status, 422);
   assert.equal((await call("DELETE", "/api/people/..%252Ftrain")).status, 422);
+  // the pictures of "to name" are Frigate's attempts, in train
+  const attempt = await call("GET", "/api/people/train/faces/e-1.0-unknown-0.1.webp");
+  assert.equal(attempt.status, 200);
+  assert.equal(attempt.data, "train/e-1.0-unknown-0.1.webp");
+  assert.equal((await call("GET", "/api/people/Alice/faces/a1.webp")).data, "Alice/a1.webp");
+  assert.equal((await call("GET", "/api/people/..%252Ftrain/faces/x.webp")).status, 422);
   await call("DELETE", "/api/people/Bob_Smith");
   await send("/people", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: "Bob Smith" }) });
   assert.equal((await (await send("/people/Bob_Smith/faces", photo("bob"))).json()).added, true);

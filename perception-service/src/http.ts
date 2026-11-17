@@ -20,7 +20,7 @@ import { canSeePictures, eventFor } from "./pictures.ts";
 import { hostAllowed, sameOrigin } from "./host.ts";
 import type { Outputs } from "./outputs.ts";
 import type { UsageCollector } from "./usage.ts";
-import { groupAttempts, personId, type FrigateFaces } from "./people.ts";
+import { groupAttempts, personId, TRAIN, type FrigateFaces } from "./people.ts";
 import type { WhoAt } from "./who.ts";
 import { importSources, sourceUrl, type Restream, type SourcePasswords } from "./restream.ts";
 import { groupMains, RuleSchema, validate, type CameraConfig, type ConfigStore } from "./settings.ts";
@@ -456,7 +456,9 @@ export class Api {
     });
     r("GET", "/api/people/([^/]+)/faces/([^/]+)", async (_q, res, [id, file]) => {
       if (!this.d.faces) return json(res, 404, { ok: false, errors: ["people not available"] });
-      const up = await this.d.faces.image(pid(id!), decodeURIComponent(file!)).catch((err: Error) => err);
+      // "train": Frigate's recent attempts, the pictures of "to name"
+      const folder = decodeURIComponent(id!) === TRAIN ? TRAIN : pid(id!);
+      const up = await this.d.faces.image(folder, decodeURIComponent(file!)).catch((err: Error) => err);
       if (up instanceof Error) return json(res, 502, { ok: false, errors: [up.message] });
       if (!up.ok) return json(res, up.status, { ok: false, errors: [`HTTP ${up.status}`] });
       res.writeHead(200, { "Content-Type": up.headers.get("content-type") ?? "image/webp", "Cache-Control": "private, max-age=3600" });

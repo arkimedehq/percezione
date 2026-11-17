@@ -2,6 +2,11 @@
 
 *[Italiano](CHANGELOG.it.md)*
 
+## 0.1.1
+
+- **People → To name** shows the pictures again: since 0.1.0 every picture of Frigate's recent attempts was refused
+  (422), so faces to name appeared without a photo.
+
 ## 0.1.0 — first public release
 
 Percezione turns IP cameras into events about people, locally, on top of Frigate and go2rtc.
