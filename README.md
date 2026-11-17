@@ -13,16 +13,17 @@ Assistant, MQTT, webhooks or AI agents (MCP), and it is configured entirely from
 
 1. [What it does](#what-it-does)
 2. [How it fits together](#how-it-fits-together)
-3. [Requirements](#requirements)
-4. [Installation](#installation)
-5. [First start](#first-start)
-6. [Configuration](#configuration)
-7. [Connecting other systems](#connecting-other-systems)
-8. [Updates and backup](#updates-and-backup)
-9. [Security](#security)
-10. [Documentation](#documentation)
-11. [Development](#development)
-12. [License](#license)
+3. [Arkimede and Recordare](#arkimede-and-recordare)
+4. [Requirements](#requirements)
+5. [Installation](#installation)
+6. [First start](#first-start)
+7. [Configuration](#configuration)
+8. [Connecting other systems](#connecting-other-systems)
+9. [Updates and backup](#updates-and-backup)
+10. [Security](#security)
+11. [Documentation](#documentation)
+12. [Development](#development)
+13. [License](#license)
 
 ## What it does
 
@@ -76,6 +77,21 @@ Everything runs with Docker Compose:
 | `setup` | Runs once at every start: creates the secrets and the base configuration, never overwrites |
 | `ollama` (profile `vlm`) | The vision-language model for activities |
 | `onnx-runner` (profile `pose`) | Posture (RTMPose) and left-object classification (CLIP) |
+
+## Arkimede and Recordare
+
+Percezione works on its own, with Home Assistant, MQTT or any MCP client. It was built as the eyes of a family of
+three self-hosted projects that work best together:
+
+| Project | Role |
+|---|---|
+| **Percezione** (this one) | **Sees:** who is home, where, what they are doing, who is at the door |
+| [**Arkimede**](https://github.com/arkimedehq/arkimede) | **Acts:** the AI agent platform. Its Percezione plugin follows the events live, tells the right person, speaks in a room and answers "who is at the door?" with the face |
+| [**Recordare**](https://github.com/arkimedehq/recordare) | **Remembers:** the long-term memory of each person. What the cameras saw becomes a *perception*, remembered as seen and left to fade; a presence tells the memory that someone is there, the right moment to remind them of something |
+
+Together: a camera sees Laura come home, Arkimede greets her in the kitchen and reminds her of what she planned for
+the evening, and later she can ask "who rang while I was out?". Each project runs alone; none needs the others.
+Setup: [docs/arkimede-plugin.md](docs/arkimede-plugin.md).
 
 ## Requirements
 

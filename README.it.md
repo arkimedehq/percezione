@@ -13,16 +13,17 @@ Assistant, MQTT, webhook o agenti AI (MCP), e si configura interamente dalla sua
 
 1. [Cosa fa](#cosa-fa)
 2. [Come si compone](#come-si-compone)
-3. [Requisiti](#requisiti)
-4. [Installazione](#installazione)
-5. [Primo avvio](#primo-avvio)
-6. [Configurazione](#configurazione)
-7. [Collegare altri sistemi](#collegare-altri-sistemi)
-8. [Aggiornamenti e backup](#aggiornamenti-e-backup)
-9. [Sicurezza](#sicurezza)
-10. [Documentazione](#documentazione)
-11. [Sviluppo](#sviluppo)
-12. [Licenza](#licenza)
+3. [Arkimede e Recordare](#arkimede-e-recordare)
+4. [Requisiti](#requisiti)
+5. [Installazione](#installazione)
+6. [Primo avvio](#primo-avvio)
+7. [Configurazione](#configurazione)
+8. [Collegare altri sistemi](#collegare-altri-sistemi)
+9. [Aggiornamenti e backup](#aggiornamenti-e-backup)
+10. [Sicurezza](#sicurezza)
+11. [Documentazione](#documentazione)
+12. [Sviluppo](#sviluppo)
+13. [Licenza](#licenza)
 
 ## Cosa fa
 
@@ -76,6 +77,21 @@ Tutto gira con Docker Compose:
 | `setup` | Gira una volta a ogni avvio: crea i segreti e la configurazione di base, non sovrascrive mai |
 | `ollama` (profilo `vlm`) | Il modello visione-linguaggio per le attività |
 | `onnx-runner` (profilo `pose`) | Postura (RTMPose) e classificazione degli oggetti lasciati (CLIP) |
+
+## Arkimede e Recordare
+
+Percezione funziona da sola, con Home Assistant, MQTT o qualunque client MCP. È nata come gli occhi di una famiglia
+di tre progetti self-hosted che danno il meglio insieme:
+
+| Progetto | Ruolo |
+|---|---|
+| **Percezione** (questo) | **Vede:** chi è in casa, dove, cosa sta facendo, chi è alla porta |
+| [**Arkimede**](https://github.com/arkimedehq/arkimede) | **Agisce:** la piattaforma degli agenti AI. Il suo plugin di Percezione segue gli eventi in diretta, avvisa la persona giusta, parla in una stanza e risponde «chi c'è alla porta?» con il volto |
+| [**Recordare**](https://github.com/arkimedehq/recordare) | **Ricorda:** la memoria a lungo termine di ogni persona. Quello che le camere hanno visto diventa una *percezione*, ricordata come vista e lasciata sbiadire; una presenza dice alla memoria che qualcuno c'è, il momento giusto per ricordargli qualcosa |
+
+Insieme: una camera vede Laura tornare a casa, Arkimede la saluta in cucina e le ricorda cosa aveva in programma per
+la sera, e più tardi lei può chiedere «chi ha suonato mentre ero fuori?». Ogni progetto funziona da solo; nessuno ha
+bisogno degli altri. Configurazione: [docs/arkimede-plugin.it.md](docs/arkimede-plugin.it.md).
 
 ## Requisiti
 
